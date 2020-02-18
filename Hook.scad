@@ -22,10 +22,51 @@ cleat_depth = 10;
 
 /* ---- Versa Trak ---- */
 
-hook_cleat();
+//hook_cleat();
+husky();
+
+//slice(r = 2, d = 270);
+
+module husky() {
+    base_height = 50;
+    base(width = hook_width, height = base_height - hook_tickness);
+    
+    translate([0,base_height - hook_tickness,0]) {
+        top_attachment();
+    }
+    
+    module top_attachment() {
+        union() {
+            slice(r = hook_tickness, h = hook_width , d = 90);
+            translate([-10,hook_tickness - 2 ,0]) {
+                cube([10, 2, hook_width]);
+                translate([0,2,0]) {
+                    rotate([0,0,150]) {
+                        slice(r = 2, h = hook_width, d = 120);
+                    }
+                    rotate([0,0,-30]) {
+                        translate([-2,0,0]) {
+                            cube([2,10,hook_width]);
+                        }
+                        translate([0,10,0]) {
+                            rotate([0,0,90])
+                            slice(r=2, h = hook_width, d = 90);
+                        }
+                    }
+                    
+                }
+            }
+            
+        }
+        
+    }
+    
+    module bottom_attachment() {
+    }
+}
 
 module hook_cleat() {
-    base(width = hook_width + 0.5) {
+    base(width = hook_width) {
         translate([hook_tickness,10,0]) {
             cleat(width = hook_width, hole=true);
         }
@@ -55,23 +96,26 @@ module cleat(width = 15, hole = false) {
     difference() {
         union() {
             cube([cleat_depth, cleat_height, width ]);
-            translate([0,-(cleat_height/2),0]) {
-                #cube([cleat_depth, cleat_height, width ]);
+            if (hole) {
+                translate([0,-(cleat_height/2),0]) {
+                    cube([cleat_depth, cleat_height, width ]);
+                }
             }
+                
         }
         translate([-1,cleat_height - cleat_depth,0]) {
             rotate([0,0,45]) {
                 cube([cleat_depth * 2,cleat_depth,width]);
             }
         }
-//        if (!hole) {
+        if (!hole) {
             translate([cleat_depth,-cleat_depth,0]) {
                 rotate([0,0,45]) {
                     translate([-cleat_depth,0,0])
-                   # cube([cleat_depth * 2,cleat_depth,width]);
+                        cube([cleat_depth * 2,cleat_depth,width]);
                 }
             }
-//        }
+        }
     }
     
     translate([1,-1,0]) {
@@ -116,7 +160,6 @@ module peg_board_base(tickness = 3, height = 50, width = 15) {
     }
 }
 
-//slice(r = 2, d = 270, center = true);
 module slice(r = 10, h = 10, d = 180, center = false) {
     
     
@@ -142,8 +185,9 @@ module slice(r = 10, h = 10, d = 180, center = false) {
     module half_cylinder(r, h, center) {
         difference() {
             cylinder(r = r, h = h, center = center);
-            translate([0,-r/2,0]) {
-                cube([r*2, r, h], center = center);
+            z_offset = center ? 0 : h/2;
+            translate([0,-r/2,z_offset]) {
+                cube([r*2, r, h], center = true);
             }
         }
     }
