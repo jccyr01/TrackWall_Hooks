@@ -20,10 +20,11 @@ hook_width = 15;
 cleat_height = 15;
 cleat_depth = 10;
 
-/* ---- Versa Trak ---- */
+/* ---- Versa Trac ---- */
 
 //hook_cleat();
-husky();
+//husky();
+versa_trac();
 
 //slice(r = 2, d = 270);
 
@@ -34,6 +35,8 @@ module husky() {
     translate([0,base_height - hook_tickness,0]) {
         top_attachment();
     }
+    bottom_attachment();
+        
     
     module top_attachment() {
         union() {
@@ -58,10 +61,60 @@ module husky() {
             }
             
         }
-        
     }
     
     module bottom_attachment() {
+        rotate([0,0,-90]) {
+            slice(r = hook_tickness, h = hook_width, d = 90);
+            translate([1,-8,0]) {
+                cube([2, 8, hook_width]);
+                rotate([0,0,90]) {
+                    translate([2,-1,0]) {
+                        difference() {
+                            slice(r = 2, h = hook_width, d = 180);
+                            translate([-2,0,0]) {
+                                cube([4,1,hook_width]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+module versa_trac() {
+        base_height = 50;
+    base(width = hook_width, height = base_height - hook_tickness);
+    
+    translate([0,base_height - hook_tickness,0]) {
+        top_attachment();
+    }
+//    bottom_attachment();
+    
+    module top_attachment() {
+        union() {
+            slice(r = hook_tickness, h = hook_width , d = 90);
+            translate([-10,hook_tickness - 2 ,0]) {
+                cube([10, 2, hook_width]);
+                translate([0,2,0]) {
+                    rotate([0,0,180]) {
+                        slice(r = 2, h = hook_width, d = 90);
+                    }
+                    rotate([0,0,0]) {
+                        translate([-2,0,0]) {
+                            cube([2,10,hook_width]);
+                        }
+                        translate([0,10,0]) {
+                            rotate([0,0,90])
+                            slice(r=2, h = hook_width, d = 90);
+                        }
+                    }
+                    
+                }
+            }
+            
+        }
     }
 }
 
