@@ -21,6 +21,9 @@ cleat_height = 15;
 cleat_depth = 10;
 
 /* ---- Versa Trac ---- */
+top_hook_height = 18;
+top_hook_depth = 13;
+top_hook_tickness = 2;
 
 //hook_cleat();
 //husky();
@@ -84,7 +87,9 @@ module husky() {
 }
 
 module versa_trac() {
-        base_height = 50;
+    base_height = 50;
+    top_hook_depth = top_hook_depth -top_hook_tickness - hook_tickness;
+    top_hook_height = top_hook_height - top_hook_tickness;
     base(width = hook_width, height = base_height - hook_tickness);
     
     translate([0,base_height - hook_tickness,0]) {
@@ -95,17 +100,17 @@ module versa_trac() {
     module top_attachment() {
         union() {
             slice(r = hook_tickness, h = hook_width , d = 90);
-            translate([-10,hook_tickness - 2 ,0]) {
-                cube([10, 2, hook_width]);
+            translate([-top_hook_depth,hook_tickness - 2 ,0]) {
+                cube([top_hook_depth, top_hook_tickness, hook_width]);
                 translate([0,2,0]) {
                     rotate([0,0,180]) {
                         slice(r = 2, h = hook_width, d = 90);
                     }
                     rotate([0,0,0]) {
                         translate([-2,0,0]) {
-                            cube([2,10,hook_width]);
+                            cube([2,top_hook_height,hook_width]);
                         }
-                        translate([0,10,0]) {
+                        translate([0,top_hook_height,0]) {
                             rotate([0,0,90])
                             slice(r=2, h = hook_width, d = 90);
                         }
