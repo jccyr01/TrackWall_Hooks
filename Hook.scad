@@ -39,6 +39,8 @@ cleat_position = 40;
 jhook_tickness = 3; //
 jhook_inner_radius = 10; //
 jhook_angle = 180; // [100:200]
+// J-hook position on the base. At 0, the bottom of the j-hook will be at the same height as the bottom of the hook.
+jhook_position = 0; //
 
 /* [Hidden] */
 $fn = 60;
@@ -67,7 +69,9 @@ module hook_base() {
             cleat();
         }
     } else if (has_jhook) {
-        j_hook();
+        translate([0,jhook_position - (bottom_hook ? bottom_hook_tickness: 0) ,0]) {
+            j_hook();
+        }
     }
     
     module top_attachment() {
@@ -142,7 +146,7 @@ module cleat(width = 15, hole = false) {
     
     difference() {
         union() {
-            cube([cleat_depth, cleat_height, width ]);
+            cube([cleat_depth, cleat_height, width]);
             if (hole) {
                 translate([0,-(cleat_height/2),0]) {
                     cube([cleat_depth, cleat_height, width ]);
@@ -176,21 +180,28 @@ module cleat(width = 15, hole = false) {
 }
 
 module j_hook() {
-    translate([jhook_inner_radius + jhook_tickness ,20,0]) {
-//        translate([-jhook_inner_radius,0,0]) cube([jhook_inner_radius,hook_width,15]);
-        rotate([0,0,180]) {
-            rotate_extrude(angle = jhook_angle, $fn=100) {
-                translate([jhook_inner_radius,0,0])
-                square([3,hook_width]);
-            }
-            
-        }
-        rotate([0,0,jhook_angle - 180])
-        translate([11.5,0,0]) {
-            slice(r = jhook_tickness/2, h=15);
-        }
-        
-    }
+	jhook_center = jhook_inner_radius + jhook_tickness;
+	
+	translate([hook_tickness - jhook_tickness,0,0]) {
+		difference() {
+			union() {
+				cube([jhook_center,jhook_center,hook_width]);
+		
+				translate([jhook_center,jhook_center,0]) {	
+				rotate ([0,0,-90])	
+					slice(r = jhook_center, h = hook_width, d = jhook_angle - 90);
+			
+					rotate([0,0,jhook_angle - 180])
+					translate([jhook_tickness/2 + jhook_inner_radius ,0,0]) {
+						slice(r = jhook_tickness/2, h=15);
+					}
+				}
+			}
+			translate([jhook_center,jhook_center,0]) {
+				cylinder(r = jhook_inner_radius, h = hook_width);
+			}
+		}
+	}
 }
 
 /* Helpers */
