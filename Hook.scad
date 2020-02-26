@@ -1,97 +1,73 @@
-$fn = 60;
-
-/*----- Variable -------*/
+/* [Hook base] */
+// Tickness of the main body
 hook_tickness = 3;
+
+// Width of the hook
 hook_width = 15;
 
-/*----- Cleat params ---*/
+// Distance between top and bottom hook attachment 
+base_height = 67.2;
+
+/* [Top attachment] */
+// 
+top_hook_depth = 10;
+
+// 
+top_hook_height = 17.5;
+
+// Tickness of the top attachment
+top_hook_tickness = 2.5;
+
+top_hook_bottom_angle = 90; // [90:90]
+top_hook_back_angle = 30; // [30:180]
+
+/* [Bottom attachment] */
+// Generate bottom attachment
+bottom_hook = true;
+bottom_hook_tickness = 2;
+bottom_hook_depth = 9;
+
+/* [Accessory Type] */
+accessory_type = "None"; // [None, Cleat, J-Hook]
+
+/* [Cleat Options] */
 cleat_height = 15;
 cleat_depth = 10;
+cleat_position = 40;
 
-/* ---- Versa Trac ---- */
-top_hook_height = 17.5;
-top_hook_depth = 13;
-top_hook_tickness = 2;
+/* [J-Hook Options] */
+jhook_tickness = 3; //
+jhook_inner_radius = 10; //
+jhook_angle = 180; // [100:200]
 
-//hook_cleat();
-husky(){
-    
-};
-//versa_trac();
+/* [Hidden] */
+$fn = 60;
 
-module husky() {
-    base_height = 50;
-    base(width = hook_width, height = base_height - hook_tickness);
-    
-    translate([0,base_height - hook_tickness,0]) {
-        top_attachment();
-    }
-    bottom_attachment();
-        
-    
-    module top_attachment() {
-        union() {
-            slice(r = hook_tickness, h = hook_width , d = 90);
-            translate([-10,hook_tickness - 2 ,0]) {
-                cube([10, 2, hook_width]);
-                translate([0,2,0]) {
-                    rotate([0,0,150]) {
-                        slice(r = 2, h = hook_width, d = 120);
-                    }
-                    rotate([0,0,-30]) {
-                        translate([-2,0,0]) {
-                            cube([2,10,hook_width]);
-                        }
-                        translate([0,10,0]) {
-                            rotate([0,0,90])
-                            slice(r=2, h = hook_width, d = 90);
-                        }
-                    }
-                    
-                }
-            }
-            
-        }
-    }
-    
-    module bottom_attachment() {
-        rotate([0,0,-90]) {
-            slice(r = hook_tickness, h = hook_width, d = 90);
-            translate([1,-8,0]) {
-                cube([2, 8, hook_width]);
-                rotate([0,0,90]) {
-                    translate([2,-1,0]) {
-                        difference() {
-                            slice(r = 2, h = hook_width, d = 180);
-                            translate([-2,0,0]) {
-                                cube([4,1,hook_width]);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
+has_cleat = accessory_type == "Cleat";
+has_jhook = accessory_type == "J-Hook";
 
-module versa_trac() {
-    top_hook_tickness = 2.5;
-    base_height = 67.2;
-    top_hook_depth = top_hook_depth - (top_hook_tickness + hook_tickness);
+hook_base();
+
+module hook_base() {
+    
+    top_hook_depth = top_hook_depth - (top_hook_tickness);
     top_hook_height = top_hook_height - (top_hook_tickness*2);
     base(width = hook_width, height = base_height);
-    
-    top_hook_bottom_angle = 90;
-    top_hook_back_angle = 90;
-    
+
     translate([0,base_height - max(hook_tickness, top_hook_tickness),0]) {
         top_attachment();
     }
     
-    bottom_attachment();
+    if (bottom_hook) {
+        bottom_attachment();
+    }
     
-    translate([0,40,0]) {
-        cleat();
+    if (has_cleat) {
+        translate([0,cleat_position,0]) {
+            cleat();
+        }
+    } else if (has_jhook) {
+        j_hook();
     }
     
     module top_attachment() {
@@ -99,8 +75,9 @@ module versa_trac() {
             translate([0,hook_tickness,0]) {
                 slice(r = hook_tickness, h = hook_width , d = top_hook_bottom_angle);
             }
+            
             rotate([0,0,top_hook_bottom_angle - 90]) {
-                translate([-top_hook_depth,hook_tickness + 0.5, 0]) {
+                translate([-top_hook_depth,hook_tickness + (hook_tickness - top_hook_tickness), 0]) {
                     cube([top_hook_depth, top_hook_tickness, hook_width]);
                     translate([0,top_hook_tickness,0]) {
                         rotate([0,0,top_hook_back_angle + 90]) {
@@ -131,8 +108,8 @@ module versa_trac() {
             }
         }
         rotate([0,0,-90]) {
-            translate([0,-9,0]) {
-                cube([2, 9, hook_width]);
+            translate([0,-bottom_hook_depth,0]) {
+                cube([bottom_hook_tickness, bottom_hook_depth, hook_width]);
                 rotate([0,0,90]) {
                     translate([2,-1,0]) {
                         difference() {
@@ -148,14 +125,6 @@ module versa_trac() {
     }
 }
 
-module hook_cleat() {
-    base(width = hook_width) {
-        translate([hook_tickness,10,0]) {
-            cleat(width = hook_width, hole=true);
-        }
-    }
-}
-
 module base(tickness = hook_tickness, height = 50, width = 15) {
     union() {
         cube([tickness, height, width ]);
@@ -163,6 +132,7 @@ module base(tickness = hook_tickness, height = 50, width = 15) {
     }
 }
 
+/* Accessories */
 module cleat(width = 15, hole = false) {
     tolerance = hole ? 0.5 : 0;
     cleat_height = cleat_height  + tolerance + 0.8;
@@ -205,6 +175,27 @@ module cleat(width = 15, hole = false) {
     }
 }
 
+module j_hook() {
+    translate([jhook_inner_radius + jhook_tickness ,20,0]) {
+//        translate([-jhook_inner_radius,0,0]) cube([jhook_inner_radius,hook_width,15]);
+        rotate([0,0,180]) {
+            rotate_extrude(angle = jhook_angle, $fn=100) {
+                translate([jhook_inner_radius,0,0])
+                square([3,hook_width]);
+            }
+            
+        }
+        rotate([0,0,jhook_angle - 180])
+        translate([11.5,0,0]) {
+            slice(r = jhook_tickness/2, h=15);
+        }
+        
+    }
+}
+
+/* Helpers */
+
+// Generates a slice of a cylinder with an angle
 module slice(r = 10, h = 10, d = 180, center = false) {
     translate([0,0,(center ? -h/2 : 0)]) {
         rotate_extrude(angle = d, $fn=100) {

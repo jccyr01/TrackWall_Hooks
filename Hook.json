@@ -1,0 +1,36 @@
+{
+    "parameterSets": {
+        "husky": {
+            "$fn": "60",
+            "cleat_depth": "10",
+            "cleat_height": "15",
+            "hook_tickness": "3",
+            "hook_width": "15",
+            "top_hook_depth": "13",
+            "top_hook_height": "17.5",
+            "top_hook_tickness": "2"
+        },
+        "versatrac": {
+            "$fn": "60",
+            "accessory_type": "J-Hook",
+            "base_height": "67.2",
+            "bottom_hook": "true",
+            "bottom_hook_depth": "9",
+            "bottom_hook_tickness": "2",
+            "cleat_depth": "10",
+            "cleat_height": "15",
+            "cleat_position": "40",
+            "hook_tickness": "3",
+            "hook_width": "15",
+            "jhook_angle": "180",
+            "jhook_inner_radius": "10",
+            "jhook_tickness": "3",
+            "top_hook_back_angle": "90",
+            "top_hook_bottom_angle": "90",
+            "top_hook_depth": "10",
+            "top_hook_height": "17.5",
+            "top_hook_tickness": "2.5"
+        }
+    },
+    "fileFormatVersion": "1"
+}
