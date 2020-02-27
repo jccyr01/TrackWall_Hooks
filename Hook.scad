@@ -30,7 +30,8 @@ bottom_hook_depth = 9.0;
 bottom_hook_pull_tab = true;
 
 /* [Accessory Type] */
-accessory_type = "None"; // [None, Cleat, J-Hook]
+accessory_type = "None"; // [None, Cleat, J-Hook, Level]
+
 
 /* [Cleat Options] */
 cleat_height = 15.0;
@@ -49,6 +50,7 @@ $fn = 60;
 
 has_cleat = accessory_type == "Cleat";
 has_jhook = accessory_type == "J-Hook";
+has_level = accessory_type == "Level";
 
 hook_base();
 
@@ -77,7 +79,11 @@ module hook_base() {
         translate([0,jhook_position - (bottom_hook ? bottom_hook_tickness: 0) ,0]) {
             j_hook();
         }
-    }
+    } else if (has_level) {
+		translate([hook_tickness,50,0]) {
+			level();
+		}
+	}
     
     module base(tickness = hook_tickness, height = 50, width = 15) {
         bottom_attachment_height = bottom_hook ? 0 : tickness;
@@ -209,11 +215,10 @@ module j_hook() {
 		difference() {
 			union() {
 				cube([jhook_center - hook_tickness,jhook_center,hook_width]);
-		
 				translate([jhook_center - hook_tickness,jhook_center,0]) {	
-				rotate ([0,0,-90]) {
-                        slice(r = jhook_center, h = hook_width, d = jhook_angle - 90);
-                }
+					rotate ([0,0,-90]) {
+							slice(r = jhook_center, h = hook_width, d = jhook_angle - 90);
+					}
 			
 					rotate([0,0,jhook_angle - 180]) {
                         translate([jhook_tickness/2 + jhook_inner_radius ,0,0]) {
@@ -229,13 +234,38 @@ module j_hook() {
 	}
 }
 
+module level() {
+	level_radius = calculateTriangleSide(72,hook_width,(180 - 72)/2);
+	translate([0,level_radius - pythagoras(hook_width/2, level_radius),0]) {
+		union() {
+			intersection() {
+				rotate([0,90,0])
+				translate([-hook_width/2,-(level_radius-10),0])
+					rotate([0,0,90-36])
+						#slice(r = level_radius, h = 15, d = 72, $fn = 10); 
+				
+				#cube([15,10,hook_width]);
+			}
+			echo (pythagoras(hook_width/2, level_radius));
+			translate([0,-(level_radius - pythagoras(hook_width/2, level_radius)),0])
+				cube([15,10,hook_width]);
+		}
+	}
+}
+
 /* Helpers */
 
 // Generates a slice of a cylinder with an angle
-module slice(r = 10, h = 10, d = 180, center = false) {
+module slice(r = 10, h = 10, d = 180, center = false, $fn = 100) {
     translate([0,0,(center ? -h/2 : 0)]) {
-        rotate_extrude(angle = d, $fn=100) {
+        rotate_extrude(angle = d, $fn=$fn) {
             square([r,h]);
         }
     }
 }
+
+function calculateTriangleSide(C, c, A) =
+	c * sin(A)/sin(C);
+
+function pythagoras(a, c) =
+	sqrt(pow(c, 2) - pow(a, 2));
