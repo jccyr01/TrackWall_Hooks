@@ -19,7 +19,7 @@ top_hook_height = 17.5;
 top_hook_tickness = 2.5;
 
 top_hook_bottom_angle = 90; // [90:90]
-top_hook_back_angle = 30; // [30:180]
+top_hook_back_angle = 90; // [30:180]
 
 /* [Bottom attachment] */
 // Generate bottom attachment
@@ -87,7 +87,7 @@ module hook_base() {
             }
             translate([tickness,tickness,0]) {
                 rotate([0,0,180]) {
-                   slice(r = tickness, h = width, d = 90);
+                   slice(r = tickness, h = width, a = 90);
                 }
             }
         }
@@ -96,7 +96,7 @@ module hook_base() {
     module top_attachment() {
         union() {
             translate([0,top_hook_tickness - hook_tickness,0]) {
-                slice(r = hook_tickness, h = hook_width , d = top_hook_bottom_angle);
+                slice(r = hook_tickness, h = hook_width , a = top_hook_bottom_angle);
             }
             
             rotate([0,0,top_hook_bottom_angle - 90]) {
@@ -104,7 +104,7 @@ module hook_base() {
                     cube([top_hook_depth, top_hook_tickness, hook_width]);
                     translate([0,top_hook_tickness,0]) {
                         rotate([0,0,top_hook_back_angle + 90]) {
-                            slice(r = top_hook_tickness, h = hook_width, d = 180 - top_hook_back_angle);
+                            slice(r = top_hook_tickness, h = hook_width, a = 180 - top_hook_back_angle);
                         }
                         rotate([0,0,top_hook_back_angle - 90]) {
                             translate([-top_hook_tickness,0,0]) {
@@ -112,7 +112,7 @@ module hook_base() {
                             }
                             translate([0,top_hook_height,0]) {
                                 rotate([0,0,90])
-                                slice(r = top_hook_tickness, h = hook_width, d = 90);
+                                slice(r = top_hook_tickness, h = hook_width, a = 90);
                             }
                         }
                         
@@ -130,12 +130,12 @@ module hook_base() {
 			if (bottom_hook_pull_tab) {
                 translate([hook_tickness,0,0]) {
                     rotate([0,0,-180]) {
-                        slice(r = hook_tickness/2, h = hook_width, d = 90);
+                        slice(r = hook_tickness/2, h = hook_width, a = 90);
                     }
                 }
             } else if (!has_jhook) {
 				translate([hook_tickness - bottom_hook_tickness,bottom_hook_tickness,0]) {
-					slice(r = bottom_hook_tickness, h = hook_width, d = -90);
+					slice(r = bottom_hook_tickness, h = hook_width, a = -90);
                 }
 				cube([hook_tickness - bottom_hook_tickness, bottom_hook_tickness, hook_width]);
             }
@@ -146,7 +146,7 @@ module hook_base() {
                 rotate([0,0,90]) {
                     translate([2,-1,0]) {
                         difference() {
-                            slice(r = 2, h = hook_width, d = 180);
+                            slice(r = 2, h = hook_width, a = 180);
                             translate([-2,0,0]) {
                                 cube([4,1,hook_width]);
                             }
@@ -212,7 +212,7 @@ module j_hook() {
 		
 				translate([jhook_center - hook_tickness,jhook_center,0]) {	
 				rotate ([0,0,-90]) {
-                        slice(r = jhook_center, h = hook_width, d = jhook_angle - 90);
+                        slice(r = jhook_center, h = hook_width, a = jhook_angle - 90);
                 }
 			
 					rotate([0,0,jhook_angle - 180]) {
@@ -232,9 +232,15 @@ module j_hook() {
 /* Helpers */
 
 // Generates a slice of a cylinder with an angle
-module slice(r = 10, h = 10, d = 180, center = false) {
+module slice(r, r1, r2, d, d1, d2, h, a = 180, center = false) {
+	r1 = r1 ? r1 : r;
+	r2 = r2 ? r2 : r;
+	d = r ? r * 2 : d;
+	d1 = d1 ? d1 : (d ? d : r1 * 2);
+	d2 = d2 ? d2 : (d ? d : r2 * 2);
+	
     translate([0,0,(center ? -h/2 : 0)]) {
-        rotate_extrude(angle = d, $fn=100) {
+        rotate_extrude(angle = a, $fn=100) {
             square([r,h]);
         }
     }
