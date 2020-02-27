@@ -26,6 +26,8 @@ top_hook_back_angle = 30; // [30:180]
 bottom_hook = true;
 bottom_hook_tickness = 2;
 bottom_hook_depth = 9;
+// Generate a tab to make it easier to remove the hook
+bottom_hook_pull_tab = true;
 
 /* [Accessory Type] */
 accessory_type = "None"; // [None, Cleat, J-Hook]
@@ -37,7 +39,7 @@ cleat_position = 40;
 
 /* [J-Hook Options] */
 jhook_tickness = 3; //
-jhook_inner_radius = 10; //
+jhook_inner_diameter = 10; //
 jhook_angle = 180; // [100:200]
 // J-hook position on the base. At 0, the bottom of the j-hook will be at the same height as the bottom of the hook.
 jhook_position = 0; //
@@ -74,6 +76,20 @@ module hook_base() {
         }
     }
     
+    module base(tickness = hook_tickness, height = 50, width = 15) {
+        bottom_attachment_height = bottom_hook ? 0 : tickness;
+        union() {
+            translate([0, bottom_attachment_height, 0]) {
+                cube([tickness, height - bottom_attachment_height, width ]);
+            }
+            translate([tickness,tickness,0]) {
+                rotate([0,0,180]) {
+                   slice(r = tickness, h = width, d = 90);
+                }
+            }
+        }
+    }
+    
     module top_attachment() {
         union() {
             translate([0,hook_tickness,0]) {
@@ -105,10 +121,20 @@ module hook_base() {
     
     module bottom_attachment() {
         translate([0,-2,0]) {
-            cube([hook_tickness,2,hook_width]);
-            translate([hook_tickness,0,0])
-            rotate([0,0,-180]) {
-                slice(r = hook_tickness/2, h = hook_width, d = 90);
+            if (bottom_hook_pull_tab || has_jhook) {
+				cube([hook_tickness,2,hook_width]);
+			}
+			if (bottom_hook_pull_tab) {
+                translate([hook_tickness,0,0]) {
+                    rotate([0,0,-180]) {
+                        slice(r = hook_tickness/2, h = hook_width, d = 90);
+                    }
+                }
+            } else if (!has_jhook) {
+				translate([hook_tickness - bottom_hook_tickness,bottom_hook_tickness,0]) {
+					slice(r = bottom_hook_tickness, h = hook_width, d = -90);
+                }
+				cube([hook_tickness - bottom_hook_tickness, bottom_hook_tickness, hook_width]);
             }
         }
         rotate([0,0,-90]) {
@@ -126,13 +152,6 @@ module hook_base() {
                 }
             }
         }
-    }
-}
-
-module base(tickness = hook_tickness, height = 50, width = 15) {
-    union() {
-        cube([tickness, height, width ]);
-        children();
     }
 }
 
@@ -180,24 +199,27 @@ module cleat(width = 15, hole = false) {
 }
 
 module j_hook() {
+	jhook_inner_radius = jhook_inner_diameter / 2;
 	jhook_center = jhook_inner_radius + jhook_tickness;
 	
-	translate([hook_tickness - jhook_tickness,0,0]) {
+	translate([jhook_tickness,0,0]) {
 		difference() {
 			union() {
-				cube([jhook_center,jhook_center,hook_width]);
+				cube([jhook_center - hook_tickness,jhook_center,hook_width]);
 		
-				translate([jhook_center,jhook_center,0]) {	
-				rotate ([0,0,-90])	
-					slice(r = jhook_center, h = hook_width, d = jhook_angle - 90);
+				translate([jhook_center - hook_tickness,jhook_center,0]) {	
+				rotate ([0,0,-90]) {
+                        slice(r = jhook_center, h = hook_width, d = jhook_angle - 90);
+                }
 			
-					rotate([0,0,jhook_angle - 180])
-					translate([jhook_tickness/2 + jhook_inner_radius ,0,0]) {
-						slice(r = jhook_tickness/2, h=15);
-					}
+					rotate([0,0,jhook_angle - 180]) {
+                        translate([jhook_tickness/2 + jhook_inner_radius ,0,0]) {
+                            slice(r = jhook_tickness/2, h=hook_width);
+                        }
+                    }
 				}
 			}
-			translate([jhook_center,jhook_center,0]) {
+			translate([jhook_center - hook_tickness,jhook_center,0]) {
 				cylinder(r = jhook_inner_radius, h = hook_width);
 			}
 		}
