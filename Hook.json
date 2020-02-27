@@ -1,22 +1,22 @@
 {
     "parameterSets": {
         "husky": {
-            "hook_tickness": "3",
-            "hook_width": "15",
-            "top_hook_depth": "13",
+            "hook_tickness": "3.0",
+            "hook_width": "15.0",
+            "top_hook_depth": "13.0",
             "top_hook_height": "17.5",
-            "top_hook_tickness": "2"
+            "top_hook_tickness": "2.0"
         },
         "versatrac": {
             "base_height": "67.2",
             "bottom_hook": "true",
-            "bottom_hook_depth": "9",
-            "bottom_hook_tickness": "2",
-            "hook_tickness": "3",
-            "hook_width": "15",
+            "bottom_hook_depth": "9.0",
+            "bottom_hook_tickness": "2.0",
+            "hook_tickness": "3.0",
+            "hook_width": "15.0",
             "top_hook_back_angle": "90",
             "top_hook_bottom_angle": "90",
-            "top_hook_depth": "10",
+            "top_hook_depth": "10.0",
             "top_hook_height": "17.5",
             "top_hook_tickness": "2.5"
         }

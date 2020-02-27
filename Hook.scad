@@ -1,16 +1,16 @@
 /* [Hook base] */
 // Tickness of the main body
-hook_tickness = 3;
+hook_tickness = 3.0;
 
 // Width of the hook
-hook_width = 15;
+hook_width = 15.0;
 
 // Distance between top and bottom hook attachment 
 base_height = 67.2;
 
 /* [Top attachment] */
 // 
-top_hook_depth = 10;
+top_hook_depth = 10.5;
 
 // 
 top_hook_height = 17.5;
@@ -24,8 +24,8 @@ top_hook_back_angle = 30; // [30:180]
 /* [Bottom attachment] */
 // Generate bottom attachment
 bottom_hook = true;
-bottom_hook_tickness = 2;
-bottom_hook_depth = 9;
+bottom_hook_tickness = 2.0;
+bottom_hook_depth = 9.0;
 // Generate a tab to make it easier to remove the hook
 bottom_hook_pull_tab = true;
 
@@ -33,16 +33,16 @@ bottom_hook_pull_tab = true;
 accessory_type = "None"; // [None, Cleat, J-Hook]
 
 /* [Cleat Options] */
-cleat_height = 15;
-cleat_depth = 10;
-cleat_position = 40;
+cleat_height = 15.0;
+cleat_depth = 10.0;
+cleat_position = 40.0;
 
 /* [J-Hook Options] */
-jhook_tickness = 3; //
-jhook_inner_diameter = 10; //
+jhook_tickness = 3.0; //
+jhook_inner_diameter = 10.0; //
 jhook_angle = 180; // [100:200]
 // J-hook position on the base. At 0, the bottom of the j-hook will be at the same height as the bottom of the hook.
-jhook_position = 0; //
+jhook_position = 0.0; //
 
 /* [Hidden] */
 $fn = 60;
@@ -56,9 +56,12 @@ module hook_base() {
     
     top_hook_depth = top_hook_depth - (top_hook_tickness);
     top_hook_height = top_hook_height - (top_hook_tickness*2);
+	base_height_original = base_height;
+	base_height = hook_tickness > top_hook_tickness ? base_height - abs(hook_tickness - top_hook_tickness) : base_height + abs(hook_tickness - top_hook_tickness);
+	echo (base_height);
     base(width = hook_width, height = base_height);
 
-    translate([0,base_height - max(hook_tickness, top_hook_tickness),0]) {
+    translate([0,base_height_original,0]) {
         top_attachment();
     }
     
@@ -92,12 +95,12 @@ module hook_base() {
     
     module top_attachment() {
         union() {
-            translate([0,hook_tickness,0]) {
+            translate([0,top_hook_tickness - hook_tickness,0]) {
                 slice(r = hook_tickness, h = hook_width , d = top_hook_bottom_angle);
             }
             
             rotate([0,0,top_hook_bottom_angle - 90]) {
-                translate([-top_hook_depth,hook_tickness + (hook_tickness - top_hook_tickness), 0]) {
+				translate([-top_hook_depth,0, 0]) {
                     cube([top_hook_depth, top_hook_tickness, hook_width]);
                     translate([0,top_hook_tickness,0]) {
                         rotate([0,0,top_hook_back_angle + 90]) {
