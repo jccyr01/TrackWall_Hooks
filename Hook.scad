@@ -6,7 +6,7 @@ hook_tickness = 3.0;
 hook_width = 15.0;
 
 // Distance between top and bottom hook attachment 
-base_height = 67.2;
+base_height = 67.0;
 
 /* [Top attachment] */
 // 
@@ -30,7 +30,7 @@ bottom_hook_depth = 9.0;
 bottom_hook_pull_tab = true;
 
 /* [Accessory Type] */
-accessory_type = "None"; // [None, Cleat, J-Hook, Level]
+accessory_type = "None"; // [None, Cleat, J-Hook, Single, Level]
 
 /* [Cleat Options] */
 cleat_height = 15.0;
@@ -49,7 +49,12 @@ level_bevel = 144; // [90:180]
 level_height = 10;
 level_depth = 15;
 level_lip_height = 2.5;
-level_position = 50.0; // 
+level_position = 50.0; //
+
+/* [Single Hook Options] */
+single_tickness = 4.0;
+single_position = 50.0;
+single_length = 30;
 
 /* [Hidden] */
 $fn = 60;
@@ -57,6 +62,7 @@ $fn = 60;
 has_cleat = accessory_type == "Cleat";
 has_jhook = accessory_type == "J-Hook";
 has_level = accessory_type == "Level";
+has_single = accessory_type == "Single";
 
 hook_base();
 
@@ -88,6 +94,10 @@ module hook_base() {
     } else if (has_level) {
 		translate([hook_tickness,level_position,0]) {
 			level(depth = level_depth, height = level_height, width = hook_width, lip_height = level_lip_height, bevel = level_bevel);
+		}
+	} else if (has_single) {
+		translate([hook_tickness,single_position,0]) {
+			singleHook(tickness = single_tickness, length = single_length, width = hook_width);
 		}
 	}
     
@@ -172,20 +182,20 @@ module hook_base() {
 
 /* Accessories */
 module cleat(width = 15, hole = false) {
-    tolerance = hole ? 0.5 : 0;
-    cleat_height = cleat_height  + tolerance + 0.8;
+    tolerance = hole ? 0 : 0;
+    cleat_height = cleat_height + tolerance + 0.8 + (hole ? 3 : 0);
     cleat_depth = cleat_depth + tolerance;
     hook_tickness = hook_tickness + tolerance;
-    width = width + tolerance;
-    
+    width = width;// + tolerance;
+    translate([0,hole?-3:0,0]) {
     difference() {
         union() {
             cube([cleat_depth, cleat_height, width]);
-            if (hole) {
-                translate([0,-(cleat_height/2),0]) {
-                    cube([cleat_depth, cleat_height, width ]);
-                }
-            }
+//            if (hole) {
+//                translate([0,-(cleat_height/4),0]) {
+//                    cube([cleat_depth, cleat_height, width ]);
+//                }
+//            }
                 
         }
         translate([-1,cleat_height - cleat_depth,0]) {
@@ -193,14 +203,14 @@ module cleat(width = 15, hole = false) {
                 cube([cleat_depth * 2,cleat_depth,width]);
             }
         }
-        if (!hole) {
+//        if (!hole) {
             translate([cleat_depth,-cleat_depth,0]) {
                 rotate([0,0,45]) {
                     translate([-cleat_depth,0,0])
                         cube([cleat_depth * 2,cleat_depth,width]);
                 }
             }
-        }
+//        }
     }
     
     translate([1,-1,0]) {
@@ -211,6 +221,7 @@ module cleat(width = 15, hole = false) {
             }
         }
     }
+}
 }
 
 module j_hook() {
@@ -274,6 +285,41 @@ module level(depth = 15, height = 10, width = hook_width, lip_height = 2.5, beve
 		
 		translate([0, height - bevel_height,width])
 			cube([depth,bevel_height + lip_height,stopper_side_width]);
+	}
+}
+
+module singleHook(tickness = 4, length = 50, width = hook_width) {
+	rotate([0,0,7]) {
+		union() {
+			cube([length,tickness, width]);
+			translate([length, 0, 0]) {
+				rotate([0,0,10]){
+					cube([10,tickness, width]);
+					translate([10,tickness/2,0]) {
+						rotate([0,0,-90]) {
+							slice(d = tickness, h = width);
+						}
+					}
+				}
+			}
+		}
+	}
+	translate([0,-1.5,0]) {
+		difference() {
+			cube([2,4,width]);
+			translate([2,-0.25,0]) {
+				cylinder(r = 2, h = width);
+			}
+		}
+	}
+	
+	translate([0,3,0]) {
+		difference() {
+			cube([2,3,width]);
+			translate([2,3.25,0]) {
+				cylinder(r = 2, h = width);
+			}
+		}
 	}
 }
 
