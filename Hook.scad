@@ -32,7 +32,6 @@ bottom_hook_pull_tab = true;
 /* [Accessory Type] */
 accessory_type = "None"; // [None, Cleat, J-Hook, Level]
 
-
 /* [Cleat Options] */
 cleat_height = 15.0;
 cleat_depth = 10.0;
@@ -44,6 +43,13 @@ jhook_inner_diameter = 10.0; //
 jhook_angle = 180; // [100:200]
 // J-hook position on the base. At 0, the bottom of the j-hook will be at the same height as the bottom of the hook.
 jhook_position = 0.0; //
+
+/* [Level Hook Options] */
+level_bevel = 144; // [90:180]
+level_height = 10;
+level_depth = 15;
+level_lip_height = 2.5;
+level_position = 50.0; // 
 
 /* [Hidden] */
 $fn = 60;
@@ -60,7 +66,7 @@ module hook_base() {
     top_hook_height = top_hook_height - (top_hook_tickness*2);
 	base_height_original = base_height;
 	base_height = hook_tickness > top_hook_tickness ? base_height - abs(hook_tickness - top_hook_tickness) : base_height + abs(hook_tickness - top_hook_tickness);
-	echo (base_height);
+	
     base(width = hook_width, height = base_height);
 
     translate([0,base_height_original,0]) {
@@ -80,8 +86,8 @@ module hook_base() {
             j_hook();
         }
     } else if (has_level) {
-		translate([hook_tickness,50,0]) {
-			level();
+		translate([hook_tickness,level_position,0]) {
+			level(depth = level_depth, height = level_height, width = hook_width, lip_height = level_lip_height, bevel = level_bevel);
 		}
 	}
     
@@ -234,44 +240,42 @@ module j_hook() {
 	}
 }
 
-module level() {
-	level_radius = calculateTriangleSide(72,hook_width,(180 - 72)/2);
-	depth = 20;
-	height = 10;
-	translate([0,level_radius - pythagoras(hook_width/2, level_radius),0]) {
+module level(depth = 15, height = 10, width = hook_width, lip_height = 2.5, bevel = 140) {	
+	slope_length = calculateTriangleSide(bevel, width, (180 - bevel) / 2);
+	
+	// Make sure bevel height is a number > 0
+	bevel_height = bevel % 180 != 0 ? pythagoras(width/2,slope_length) : 0.1;
+	
+	difference() {
 		union() {
-			intersection() {
-				rotate([0,90,0])
-				translate([-hook_width/2,-(level_radius-height),0])
-					rotate([0,0,90-36])
-						slice(r = level_radius, h = depth, a = 72, $fn = 10); 
-				
-				cube([depth,height,hook_width]);
+			translate([0,height - bevel_height,width / 2]) {
+				resize([depth,bevel_height,width + 2]) {
+					rotate([0,90,0])
+						slice(d1 = width, d2 = width + 2, $fn = 4);
+				}
 			}
+				
+			cube([depth, height - bevel_height, width]);
 			
-			translate([0,-(level_radius - pythagoras(hook_width/2, level_radius)),0]) {
-				cube([depth,height,hook_width]);
-
-				translate([depth,0,hook_width/2]) {
-					difference() {
-						rotate([0,90,0]) {
-							slice(r1 = level_radius, r2 = level_radius + 2, h = 2);
-						}
-						
-						stopper_side_width = (((level_radius + 2) * 2) - hook_width) / 2;
-						translate([0,0,hook_width / 2]) {
-							cube([2,level_radius+2,stopper_side_width]);
-						}
-						translate([0,0,-(stopper_side_width + hook_width/2)]) {
-							cube([2,level_radius+2,stopper_side_width]);
-						}
+			
+			translate([depth - 2,height - bevel_height,width / 2]) {
+				resize([0,bevel_height+lip_height,0]) {
+					rotate([0,90,0]) {
+						slice(d1 = width-1, d2 = width + 2 , h = 2);
 					}
 				}
 			}
-		}
+		}	
+		
+		stopper_side_width = ((width + 2) - hook_width) / 2;
+		
+		translate([0, height - bevel_height,-stopper_side_width])
+			cube([depth, bevel_height + lip_height,stopper_side_width]);
+		
+		translate([0, height - bevel_height,width])
+			cube([depth,bevel_height + lip_height,stopper_side_width]);
 	}
 }
-
 
 /* Helpers */
 
