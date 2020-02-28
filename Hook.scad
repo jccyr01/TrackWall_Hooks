@@ -236,38 +236,57 @@ module j_hook() {
 
 module level() {
 	level_radius = calculateTriangleSide(72,hook_width,(180 - 72)/2);
+	depth = 20;
+	height = 10;
 	translate([0,level_radius - pythagoras(hook_width/2, level_radius),0]) {
 		union() {
 			intersection() {
 				rotate([0,90,0])
-				translate([-hook_width/2,-(level_radius-10),0])
+				translate([-hook_width/2,-(level_radius-height),0])
 					rotate([0,0,90-36])
-						#slice(r = level_radius, h = 15, d = 72, $fn = 10); 
+						slice(r = level_radius, h = depth, a = 72, $fn = 10); 
 				
-				#cube([15,10,hook_width]);
+				cube([depth,height,hook_width]);
 			}
-			echo (pythagoras(hook_width/2, level_radius));
-			translate([0,-(level_radius - pythagoras(hook_width/2, level_radius)),0])
-				cube([15,10,hook_width]);
+			
+			translate([0,-(level_radius - pythagoras(hook_width/2, level_radius)),0]) {
+				cube([depth,height,hook_width]);
+
+				translate([depth,0,hook_width/2]) {
+					difference() {
+						rotate([0,90,0]) {
+							slice(r1 = level_radius, r2 = level_radius + 2, h = 2);
+						}
+						
+						stopper_side_width = (((level_radius + 2) * 2) - hook_width) / 2;
+						translate([0,0,hook_width / 2]) {
+							cube([2,level_radius+2,stopper_side_width]);
+						}
+						translate([0,0,-(stopper_side_width + hook_width/2)]) {
+							cube([2,level_radius+2,stopper_side_width]);
+						}
+					}
+				}
+			}
 		}
 	}
 }
 
+
 /* Helpers */
 
 // Generates a slice of a cylinder with an angle
-module slice(r, r1, r2, d, d1, d2, h, a = 180, center = false) {
-	r1 = r1 ? r1 : r;
-	r2 = r2 ? r2 : r;
-	d = r ? r * 2 : d;
-	d1 = d1 ? d1 : (d ? d : r1 * 2);
-	d2 = d2 ? d2 : (d ? d : r2 * 2);
+module slice(r, r1, r2, d, d1, d2, h = 10, a = 180, center = false, $fn = 100) {
+	_r = r ? r : 1;
+	_r1 = r1 ? r1 : _r;
+	_r2 = r2 ? r2 : _r;
+	_d = d ? d : _r * 2;
+	_d1 = d1 ? d1 : d ? d : (_r1 ? _r1 * 2 : _d);
+	_d2 = d2 ? d2 : d ? d : (_r2 ? _r2 * 2 : _d);
 	
-    translate([0,0,(center ? -h/2 : 0)]) {
-        rotate_extrude(angle = a, $fn=100) {
-            square([r,h]);
-        }
-    }
+	rotate_extrude(angle = a, $fn=$fn) {
+		polygon([[0,0],[_d1/2,0],[_d2/2,h],[0,h]]);
+	}
 }
 
 function calculateTriangleSide(C, c, A) =
