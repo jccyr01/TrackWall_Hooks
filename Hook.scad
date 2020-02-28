@@ -232,16 +232,16 @@ module j_hook() {
 /* Helpers */
 
 // Generates a slice of a cylinder with an angle
-module slice(r, r1, r2, d, d1, d2, h, a = 180, center = false) {
+//slice(d1 = 10, d2 = 20);
+module slice(r = 10, r1, r2, d, d1, d2, h = 10, a = 180, center = false) {
 	r1 = r1 ? r1 : r;
 	r2 = r2 ? r2 : r;
 	d = r ? r * 2 : d;
 	d1 = d1 ? d1 : (d ? d : r1 * 2);
 	d2 = d2 ? d2 : (d ? d : r2 * 2);
 	
-    translate([0,0,(center ? -h/2 : 0)]) {
-        rotate_extrude(angle = a, $fn=100) {
-            square([r,h]);
-        }
-    }
+	rotate_extrude(angle = a, $fn=100) {
+		polygon([[0,0],[d1/2,0],[d2/2,h],[0,h]]);
+	}
+
 }
