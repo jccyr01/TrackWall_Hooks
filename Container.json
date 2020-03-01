@@ -1,0 +1,20 @@
+{
+    "parameterSets": {
+        "bin": {
+            "$fn": "60",
+            "actual_wall_tickness": "0.01",
+            "bottom_depth": "50",
+            "bottom_tickness": "3",
+            "cleat_insert_box_depth": "16",
+            "cleat_insert_box_width": "18",
+            "front_opening_angle": "30",
+            "height": "60",
+            "minkowski_radius": "1",
+            "tickness_before_rounding": "0.01",
+            "top_depth": "100",
+            "wall_tickness": "2",
+            "width": "100"
+        }
+    },
+    "fileFormatVersion": "1"
+}
