@@ -16,7 +16,7 @@ top_hook_depth = 10.5;
 top_hook_height = 17.5;
 
 // Tickness of the top attachment
-top_hook_tickness = 2.5;
+top_hook_tickness = 3.0;
 
 top_hook_bottom_angle = 90; // [90:90]
 top_hook_back_angle = 90; // [30:180]
