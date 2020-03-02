@@ -91,7 +91,7 @@ module hook_base() {
         }
     } else if (has_jhook) {
         translate([hook_tickness,jhook_position - (bottom_hook ? bottom_hook_tickness: 0) ,0]) {
-            j_hook();
+            j_hook(tickness = jhook_tickness, inner_diameter = jhook_inner_diameter, angle = jhook_angle, width = hook_width);
         }
     } else if (has_level) {
 		translate([hook_tickness,level_position,0]) {
@@ -183,23 +183,20 @@ module hook_base() {
 }
 
 /* Accessories */
-module cleat(width = 15) {
-    cleat_height = cleat_height + 0.8;
-    width = width;
-    
+module cleat(width = 15, height = 15, depth = 10) {    
     difference() {
         union() {
-            cube([cleat_depth, cleat_height, width]);
+            cube([depth, height, width]);
         }
-        translate([-1,cleat_height - cleat_depth,0]) {
+        translate([-1,height - depth,0]) {
             rotate([0,0,45]) {
-                cube([cleat_depth * 2,cleat_depth,width]);
+                cube([depth * 2, depth, width]);
             }
         }
-        translate([cleat_depth,-cleat_depth,0]) {
+        translate([depth, -depth,0]) {
 			rotate([0,0,45]) {
-				translate([-cleat_depth,0,0])
-					cube([cleat_depth * 2,cleat_depth,width]);
+				translate([-depth,0,0])
+					cube([depth * 2, depth, width]);
 			}
 		}
     }
@@ -207,34 +204,34 @@ module cleat(width = 15) {
     translate([1,-1,0]) {
         rotate([0,0,90]) {
             difference() {
-                cube([1,1, width]);
+                cube([1, 1, width]);
                 cylinder(r = 1, h = width);
             }
         }
     }
 }
 
-module j_hook() {
-	jhook_inner_radius = jhook_inner_diameter / 2;
-	jhook_center = jhook_inner_radius + jhook_tickness;
+module j_hook(tickness = 4, inner_diameter = 40, angle = 180, width = hook_width) {
+	inner_radius = inner_diameter / 2;
+	center_position = inner_radius + tickness;
 	
 	difference() {
 		union() {
-			cube([jhook_center - hook_tickness,jhook_center,hook_width]);
-			translate([jhook_center - hook_tickness,jhook_center,0]) {	
+			cube([center_position - tickness, center_position,width]);
+			translate([center_position - tickness, center_position,0]) {	
 				rotate ([0,0,-90]) {
-						slice(r = jhook_center, h = hook_width, a = jhook_angle - 90);
+						slice(r = center_position, h = width, a = angle - 90);
 				}
 
-				rotate([0,0,jhook_angle - 180]) {
-					translate([jhook_tickness/2 + jhook_inner_radius ,0,0]) {
-						slice(r = jhook_tickness/2, h=hook_width);
+				rotate([0,0, angle - 180]) {
+					translate([jhook_tickness/2 + inner_radius ,0,0]) {
+						slice(r = tickness/2, h=hook_width);
 					}
 				}
 			}
 		}
-		translate([jhook_center - hook_tickness,jhook_center,0]) {
-			cylinder(r = jhook_inner_radius, h = hook_width);
+		translate([center_position - hook_tickness, center_position,0]) {
+			cylinder(r = inner_radius, h = hook_width);
 		}
 	}
 }
@@ -247,8 +244,8 @@ module level(depth = 15, height = 10, width = hook_width, lip_height = 2.5, beve
 	
 	difference() {
 		union() {
-			translate([0,height - bevel_height,width / 2]) {
-				resize([depth,bevel_height,width + 2]) {
+			translate([0,height - bevel_height, width / 2]) {
+				resize([depth, bevel_height, width + 2]) {
 					rotate([0,90,0])
 						slice(d1 = width, d2 = width + 2, $fn = 4);
 				}
@@ -266,9 +263,9 @@ module level(depth = 15, height = 10, width = hook_width, lip_height = 2.5, beve
 			}
 		}	
 		
-		stopper_side_width = ((width + 2) - hook_width) / 2;
+		stopper_side_width = ((width + 2) - width) / 2;
 		
-		translate([0, height - bevel_height,-stopper_side_width])
+		translate([0, height - bevel_height, -stopper_side_width])
 			cube([depth, bevel_height + lip_height,stopper_side_width]);
 		
 		translate([0, height - bevel_height,width])
