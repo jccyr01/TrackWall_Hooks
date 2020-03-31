@@ -6,7 +6,7 @@ hook_tickness = 4.0;
 hook_width = 15.0;
 
 // Distance between top and bottom hook attachment 
-base_height = 67.0;
+base_height = 67.01;
 
 /* [Top attachment] */
 // 
@@ -18,7 +18,7 @@ top_hook_height = 17.5;
 // Tickness of the top attachment
 top_hook_tickness = 3.0;
 
-top_hook_bottom_angle = 90; // [90:90]
+top_hook_bottom_angle = 90; // [60:120]
 top_hook_back_angle = 90; // [30:180]
 
 /* [Bottom attachment] */
