@@ -72,6 +72,7 @@ modifier_extra_height = 30;
 
 hook_base();
 
+// Base hook without any accessory
 module hook_base() {
 	hook_width = hook_width + (has_cleat && cleat_modifier ? modifier_tolerance : 0);
 	top_hook_depth = top_hook_depth - (top_hook_tickness);
@@ -117,8 +118,8 @@ module hook_base() {
             translate([0, bottom_attachment_height, 0]) {
                 cube([tickness, height - bottom_attachment_height, width ]);
             }
-            translate([tickness,tickness,0]) {
-                rotate([0,0,180]) {
+            translate([0,tickness,0]) {
+                rotate([0,0,270]) {
                    slice(r = tickness, h = width, a = 90);
                 }
             }
@@ -231,7 +232,7 @@ module j_hook(tickness = 4, inner_diameter = 40, angle = 180, width) {
 			cube([center_position - tickness, center_position,width]);
 			translate([center_position - tickness, center_position,0]) {	
 				rotate ([0,0,-90]) {
-						slice(r = center_position, h = width, a = angle - 90);
+					slice(r = center_position, h = width, a = angle - 90);
 				}
 
 				rotate([0,0, angle - 180]) {
@@ -241,8 +242,8 @@ module j_hook(tickness = 4, inner_diameter = 40, angle = 180, width) {
 				}
 			}
 		}
-		translate([center_position - hook_tickness, center_position,0]) {
-			cylinder(r = inner_radius, h = width);
+		translate([center_position - tickness, center_position,0]) {
+			#cylinder(r = inner_radius, h = width);
 		}
 	}
 }
