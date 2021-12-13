@@ -30,13 +30,12 @@ bottom_hook_depth = 9.0;
 bottom_hook_pull_tab = true;
 
 /* [Accessory Type] */
-accessory_type = "None"; // [None, Cleat, J-Hook, Single, Level]
+accessory_type = "None"; // [None, Cleat, J-Hook, Level, Single]
 
 /* [Cleat Options] */
 cleat_height = 15.0;
 cleat_depth = 10.0;
 cleat_position = 40.0;
-cleat_modifier = false; //
 modifier_tolerance = 0.8; //
 
 /* [J-Hook Options] */
@@ -66,6 +65,8 @@ has_jhook = accessory_type == "J-Hook";
 has_level = accessory_type == "Level";
 has_single = accessory_type == "Single";
 
+cleat_modifier = false; //
+
 modifier_extra_height = 30;
 
 /* --- */
@@ -80,37 +81,39 @@ module hook_base() {
 	base_height_original = base_height;
 	base_height = (hook_tickness > top_hook_tickness ? base_height - abs(hook_tickness - top_hook_tickness) : base_height + abs(hook_tickness - top_hook_tickness)) + (cleat_modifier ? modifier_extra_height : 0);
 	
-	translate([0,cleat_modifier ? -(modifier_extra_height/2):0,0]) {
-		base(width = hook_width, height = base_height);
-	}
-    
-	if (!cleat_modifier) {
-		translate([0,base_height_original,0]) {
-			top_attachment();
-		}
-		if (bottom_hook) {
-			bottom_attachment();
-		}
-	}
-    
-    if (has_cleat) {
-		cleat_position = cleat_position - (cleat_modifier ? 4 : 0);
-        translate([hook_tickness,cleat_position,0]) {
-            cleat(width = hook_width, height = cleat_height, depth = cleat_depth);
+    union() {
+        translate([0,cleat_modifier ? -(modifier_extra_height/2):0,0]) {
+            base(width = hook_width, height = base_height);
         }
-    } else if (has_jhook) {
-        translate([hook_tickness,jhook_position - (bottom_hook ? bottom_hook_tickness: 0) ,0]) {
-            j_hook(tickness = jhook_tickness, inner_diameter = jhook_inner_diameter, angle = jhook_angle, width = hook_width);
+        
+        if (!cleat_modifier) {
+            translate([0,base_height_original,0]) {
+                top_attachment();
+            }
+            if (bottom_hook) {
+                bottom_attachment();
+            }
         }
-    } else if (has_level) {
-		translate([hook_tickness,level_position,0]) {
-			level(depth = level_depth, height = level_height, width = hook_width, lip_height = level_lip_height, bevel = level_bevel);
-		}
-	} else if (has_single) {
-		translate([hook_tickness,single_position,0]) {
-			singleHook(tickness = single_tickness, length = single_length, width = hook_width);
-		}
-	}
+        
+        if (has_cleat) {
+            cleat_position = cleat_position - (cleat_modifier ? 4 : 0);
+            translate([hook_tickness,cleat_position,0]) {
+                cleat(width = hook_width, height = cleat_height, depth = cleat_depth);
+            }
+        } else if (has_jhook) {
+            translate([hook_tickness,jhook_position - (bottom_hook ? bottom_hook_tickness: 0) ,0]) {
+                j_hook(tickness = jhook_tickness, inner_diameter = jhook_inner_diameter, angle = jhook_angle, width = hook_width);
+            }
+        } else if (has_level) {
+            translate([hook_tickness,level_position,0]) {
+                level(depth = level_depth, height = level_height, width = hook_width, lip_height = level_lip_height, bevel = level_bevel);
+            }
+        } else if (has_single) {
+            translate([hook_tickness,single_position,0]) {
+                singleHook(tickness = single_tickness, length = single_length, width = hook_width);
+            }
+        }
+    }
     
     module base(tickness = hook_tickness, height = 50, width = 15) {
         bottom_attachment_height = bottom_hook ? 0 : tickness;
@@ -144,44 +147,47 @@ module hook_base() {
                                 cube([top_hook_tickness,top_hook_height,hook_width]);
                             }
                             translate([0,top_hook_height,0]) {
-                                rotate([0,0,90])
-                                slice(r = top_hook_tickness, h = hook_width, a = 90);
+                                rotate([0,0,90]) {
+                                    slice(r = top_hook_tickness, h = hook_width, a = 90);
+                                }
                             }
                         }
                         
                     }
                 }
-            }            
+            }        
         }
     }
     
     module bottom_attachment() {
-        translate([0,-2,0]) {
-            if (bottom_hook_pull_tab || has_jhook) {
-				cube([hook_tickness,2,hook_width]);
-			}
-			if (bottom_hook_pull_tab) {
-                translate([hook_tickness,0,0]) {
-                    rotate([0,0,-180]) {
-                        slice(r = hook_tickness/2, h = hook_width, a = 90);
+        union() {
+            translate([0,-2,0]) {
+                if (bottom_hook_pull_tab || has_jhook) {
+                    cube([hook_tickness,2,hook_width]);
+                }
+                if (bottom_hook_pull_tab) {
+                    translate([hook_tickness,0,0]) {
+                        rotate([0,0,-180]) {
+                            slice(r = hook_tickness/2, h = hook_width, a = 90);
+                        }
                     }
+                } else if (!has_jhook) {
+                    translate([hook_tickness - bottom_hook_tickness,bottom_hook_tickness,0]) {
+                        slice(r = bottom_hook_tickness, h = hook_width, a = -90);
+                    }
+                    cube([hook_tickness - bottom_hook_tickness, bottom_hook_tickness, hook_width]);
                 }
-            } else if (!has_jhook) {
-				translate([hook_tickness - bottom_hook_tickness,bottom_hook_tickness,0]) {
-					slice(r = bottom_hook_tickness, h = hook_width, a = -90);
-                }
-				cube([hook_tickness - bottom_hook_tickness, bottom_hook_tickness, hook_width]);
             }
-        }
-        rotate([0,0,-90]) {
-            translate([0,-bottom_hook_depth,0]) {
-                cube([bottom_hook_tickness, bottom_hook_depth, hook_width]);
-                rotate([0,0,90]) {
-                    translate([2,-1,0]) {
-                        difference() {
-                            slice(r = 2, h = hook_width, a = 180);
-                            translate([-2,0,0]) {
-                                cube([4,1,hook_width]);
+            rotate([0,0,-90]) {
+                translate([0,-bottom_hook_depth,0]) {
+                    cube([bottom_hook_tickness, bottom_hook_depth, hook_width]);
+                    rotate([0,0,90]) {
+                        translate([2,-1,0]) {
+                            difference() {
+                                slice(r = 2, h = hook_width, a = 180);
+                                translate([-2,0,0]) {
+                                    cube([4,1,hook_width]);
+                                }
                             }
                         }
                     }
@@ -243,7 +249,7 @@ module j_hook(tickness = 4, inner_diameter = 40, angle = 180, width) {
 			}
 		}
 		translate([center_position - tickness, center_position,0]) {
-			#cylinder(r = inner_radius, h = width);
+			cylinder(r = inner_radius, h = width);
 		}
 	}
 }
