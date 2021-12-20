@@ -109,8 +109,16 @@ module hook() {
                 cube([tickness, height - bottom_attachment_height, width ]);
             }
             if (!bottom_hook) {
-                translate([tickness/2,tickness,0]) {
-                    cylinder(r = tickness/2, h = width);
+                if (!has_jhook) {
+                    translate([tickness/2,tickness,0]) {
+                        cylinder(r = tickness/2, h = width);
+                    }
+                } else {
+                    translate([tickness,tickness,0]) {
+                        rotate([0,0,180]) {
+                            slice(r = tickness, h=width, a = 90);
+                        }
+                    }
                 }
             }
         }
