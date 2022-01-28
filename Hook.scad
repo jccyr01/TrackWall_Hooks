@@ -127,15 +127,15 @@ module hook() {
     module top_attachment() {
         union() {
             translate([0,top_hook_tickness - hook_tickness,0]) {
-                slice(r = hook_tickness, h = hook_width , a = top_hook_bottom_angle);
+                slice(r = hook_tickness, h = hook_width , a = top_hook_bottom_angle+0.0001);
             }
             
             rotate([0,0,top_hook_bottom_angle - 90]) {
 				translate([-top_hook_depth,0, 0]) {
                     cube([top_hook_depth, top_hook_tickness, hook_width]);
 					translate([0,top_hook_tickness,0]) {
-                        rotate([0,0,top_hook_back_angle + 90]) {
-                            slice(r = top_hook_tickness, h = hook_width, a = 180 - top_hook_back_angle);
+                        rotate([0,0,top_hook_back_angle + (90 - 0.0001)]) {
+                            slice(r = top_hook_tickness, h = hook_width, a = 180.0001 - top_hook_back_angle);
                         }
                         rotate([0,0,top_hook_back_angle - 90]) {
                             translate([-top_hook_tickness,0,0]) {
@@ -358,6 +358,7 @@ module slice(r, r1, r2, d, d1, d2, h = 10, a = 180, center = false, $fn = 100) {
 		polygon([[0,0],[_d1/2,0],[_d2/2,h],[0,h]]);
 	}
 }
+
 
 function calculateTriangleSide(C, c, A) =
 	c * sin(A)/sin(C);

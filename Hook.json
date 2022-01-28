@@ -178,7 +178,7 @@
         "husky_base_bottom_attach": {
             "$fn": "60",
             "accessory_type": "None",
-            "base_height": "113.5",
+            "base_height": "111.5",
             "bottom_hook": "true",
             "bottom_hook_depth": "9",
             "bottom_hook_pull_tab": "true",
@@ -194,7 +194,7 @@
         "husky_cleat_bottom_attach": {
             "$fn": "60",
             "accessory_type": "Cleat",
-            "base_height": "113.5",
+            "base_height": "111.5",
             "bottom_hook": "true",
             "bottom_hook_depth": "9",
             "bottom_hook_pull_tab": "true",
@@ -213,7 +213,7 @@
         "husky_jhook_bottom_attach": {
             "$fn": "60",
             "accessory_type": "J-Hook",
-            "base_height": "113.5",
+            "base_height": "111.5",
             "bottom_hook": "true",
             "bottom_hook_depth": "9",
             "bottom_hook_pull_tab": "false",
@@ -233,7 +233,7 @@
         "husky_level_bottom_attach": {
             "$fn": "60",
             "accessory_type": "Level",
-            "base_height": "113.5",
+            "base_height": "111.5",
             "bottom_hook": "true",
             "bottom_hook_depth": "9",
             "bottom_hook_pull_tab": "true",
@@ -254,7 +254,7 @@
         "husky_singleHook_bottom_attach": {
             "$fn": "60",
             "accessory_type": "Single",
-            "base_height": "113.5",
+            "base_height": "111.5",
             "bottom_hook": "true",
             "bottom_hook_depth": "9",
             "bottom_hook_pull_tab": "true",
